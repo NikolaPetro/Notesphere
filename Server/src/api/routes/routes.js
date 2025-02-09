@@ -1,11 +1,11 @@
 import express from 'express';
-import asyncHandler from 'express-async-handler';
+import { getNotess, createNotes, updateNotes, deleteNotes } from '../controllers/controller.js';
 
-import { getNotess } from '../controllers/controller.js';
 const router = express.Router();
 
-
-router.get('/', asyncHandler(getNotess));
-
+router.get('/', getNotess);
+router.post('/', createNotes);
+router.put('/:id', updateNotes);
+router.delete('/:id', deleteNotes);
 
 export default router;

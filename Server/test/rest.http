@@ -1,7 +1,28 @@
-
 GET http://localhost:3000/
 
+### 
+POST http://localhost:3000/
+Content-Type: application/json
 
+{
+    "title": "Hazelnut Recipe",
+    "description": "Special recipe for roasted hazelnuts with honey glaze",
+    "tags": ["cooking", "recipes", "nuts"],
+    "image": "hazelnuts.jpg"
+}
+
+### 
+PUT http://localhost:3000/1
+Content-Type: application/json
+
+{
+    "title": "Updated Hazelnut Recipe",
+    "description": "Updated recipe with additional spices",
+    "tags": ["cooking", "recipes", "nuts", "updated"]
+}
+
+###
+DELETE http://localhost:3000/1
 
 
 

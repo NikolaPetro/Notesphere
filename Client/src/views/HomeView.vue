@@ -3,7 +3,7 @@
     <q-table :rows="dataa" :columns="columns" row-key="id" flat bordered>
       <template v-slot:body-cell-image="props">
         <q-img
-          :src="`http://localhost:3000/${props.row.image}`"
+          :src="`http://localhost:3000/public/${props.row.image}`"
           style="max-width: 100px; max-height: 60px"
         />
       </template>

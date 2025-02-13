@@ -7,6 +7,10 @@ import vue from '@vitejs/plugin-vue';
 import { quasar, transformAssetUrls } from '@quasar/vite-plugin';
 
 export default defineConfig({
+  build: {
+    outDir: '../server/public',
+    emptyOutDir: false,
+  },
   server: {
     port: 8080,
   },
@@ -17,9 +21,25 @@ export default defineConfig({
     VitePWA({
       manifest,
       includeAssets: ['**/*.{js,css,html,ico,jpg,png,svg,ttf,jpeg}'],
-      strategies: 'injectManifest',
-      srcDir: 'src',
-      filename: 'costum-service-worker.js',
+      workbox: {
+        mode: 'development',
+        runtimeCaching: [
+          {
+            urlPattern: '/notes',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'NotesCache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 1, // <== 1 day
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+        ],
+      },
     }),
 
     quasar({
@@ -32,11 +52,11 @@ export default defineConfig({
     },
   },
   preview: {
-    port: 4173,
+    port: 4175,
     proxy: {
-      '/products': {
+      '/': {
         target: 'http://localhost:3000/',
-        changeOrigin: true,
+        changeOrigin: true
       },
     },
   },

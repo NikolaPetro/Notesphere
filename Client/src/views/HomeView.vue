@@ -1,50 +1,137 @@
 <template>
-  <q-page-container class="q-pa-xl">
-    <q-table :rows="dataa" :columns="columns" row-key="id" flat bordered>
-      <template v-slot:body-cell-image="props">
-        <q-img
-          :src="`http://localhost:3000/public/${props.row.image}`"
-          style="max-width: 100px; max-height: 60px"
+  <q-page padding>
+    <div class="row q-col-gutter-md">
+      <div class="col-12">
+        <q-input
+          v-model="searchTerm"
+          filled
+          type="search"
+          label="Search notes"
+        >
+          <template v-slot:prepend>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+      </div>
+      <div class="col-12">
+        <q-btn-toggle
+          v-model="viewType"
+          spread
+          no-caps
+          toggle-color="primary"
+          color="white"
+          text-color="primary"
+          :options="[
+            {label: 'Grid', value: 'grid', icon: 'grid_view'},
+            {label: 'List', value: 'list', icon: 'view_list'}
+          ]"
         />
+      </div>
+      <div class="col-12">
+        <q-card class="quick-create-area cursor-pointer" @click="createNote('note')">
+    <q-card-section>
+      <div class="row items-center">
+        <q-icon name="add" size="sm" color="primary" />
+        <div class="text-primary q-ml-sm">Click to create...</div>
+      </div>
+    </q-card-section>
+  </q-card>
+      </div>
+      <template v-for="note in filteredNotes" :key="note.id">
+        <div :class="{'col-12': viewType === 'list', 'col-12 col-md-6 col-lg-4': viewType === 'grid'}">
+          <note-card
+            :note="note"
+            :is-list-view="viewType === 'list'"
+            @click="openNoteModal(note)"
+          />
+        </div>
       </template>
-      <template v-slot:body-cell-created_at="props">
-        {{ new Date(props.row.created_at).toLocaleDateString() }}
-      </template>
-    </q-table>
-  </q-page-container>
+    </div>
+
+    <note-modal
+      v-if="selectedNote"
+      :note="selectedNote"
+      @close="closeNoteModal"
+      @update="updateNote"
+      @delete="deleteNote"
+    />
+  </q-page>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
-import axios from 'axios';
+import { ref, computed, onMounted } from 'vue';
+import { useStore } from '../stores/usestore';
+import NoteCard from '../components/NoteCard.vue';
+import NoteModal from '../components/NoteModal.vue';
 
-const dataa = ref([]);
+const store = useStore();
+const searchTerm = ref('');
+const selectedNote = ref(null);
+const viewType = ref('grid');
+const creatingNote = ref(false);
 
-const getData = async () => {
+const filteredNotes = computed(() => {
+  const searchRegex = new RegExp(searchTerm.value, 'i');
+  return store.notes.filter(note =>
+    searchRegex.test(note.title) || searchRegex.test(note.content)
+  );
+});
+
+const createNote = async (type) => {
+  if (creatingNote.value) return;
+  creatingNote.value = true;
+
+  const newNote = {
+    title: '',
+    content: '',
+    type,
+    ...(type === 'todo' ? { items: [] } : {})
+  };
+  await store.addNote(newNote);
+  selectedNote.value = newNote;
+
+  creatingNote.value = false;
+};
+
+const updateNote = async (updatedNote) => {
+  
   try {
-    const response = await axios.get('http://localhost:3000/');
-    dataa.value = response.data;
+    await store.updateNote(updatedNote.id, updatedNote);
+    selectedNote.value = null;
   } catch (error) {
-    console.error('Error fetching products:', error);
+    console.log();
   }
 };
 
-onMounted(() => {
-  getData();
-});
+const deleteNote = async (id) => {
 
-const columns = [
-  { name: 'image', label: 'Image', field: 'image', align: 'center' },
-  { name: 'title', label: 'Title', field: 'title', align: 'left' },
-  { name: 'description', label: 'Description', field: 'description', align: 'left' },
-  { name: 'created_at', label: 'Created At', field: 'created_at', align: 'center' },
-  { name: 'tags', label: 'Tags', field: 'tags', align: 'left' },
-];
+  try {
+    await store.deleteNote(id);
+    selectedNote.value = null;
+  } catch (error) {
+    console.log();
+  }
+};
+
+const openNoteModal = (note) => {
+  selectedNote.value = note;
+};
+
+const closeNoteModal = () => {
+  selectedNote.value = null;
+};
+
+onMounted(() => {
+  store.fetchNotes();
+});
 </script>
 
-<style>
-body {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 200;
+<style lang="scss" scoped>
+.quick-create-area {
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: $grey-2;
+  }
 }
 </style>

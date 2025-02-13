@@ -1,4 +1,4 @@
-import { getNotes, createNote, updateNote, deleteNote } from '../models/model.js';
+import { getNotes, createNote, updateNote, deleteNote } from '../models/model.js';  
 
 
 const getNotess = async (req, res) => {
@@ -25,7 +25,7 @@ const updateNotes = async (req, res) => {
   try {
     const updatedNote = await updateNote(req.params.id, req.body);
     res.status(200).json(updatedNote);
-  } catch (err) {
+  } catch (err) {          
     if (err.message === 'Note not found') {
       res.status(404).send('Note not found');
     } else {

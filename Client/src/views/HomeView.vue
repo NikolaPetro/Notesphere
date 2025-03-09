@@ -42,7 +42,7 @@
           <note-card
             :note="note"
             :is-list-view="viewType === 'list'"
-            @click="openNoteModal(note)"
+            @click="selectedNote = note"
           />
         </div>
       </template>
@@ -51,9 +51,9 @@
     <note-modal
       v-if="selectedNote"
       :note="selectedNote"
-      @close="closeNoteModal"
-      @update="updateNote"
-      @delete="deleteNote"
+      @close="selectedNote = null"
+      @update="store.updateNote($event.id, $event)"
+      @delete="store.deleteNote($event)"
     />
   </q-page>
 </template>
@@ -91,34 +91,6 @@ const createNote = async (type) => {
   selectedNote.value = newNote;
 
   creatingNote.value = false;
-};
-
-const updateNote = async (updatedNote) => {
-  
-  try {
-    await store.updateNote(updatedNote.id, updatedNote);
-    selectedNote.value = null;
-  } catch (error) {
-    console.log();
-  }
-};
-
-const deleteNote = async (id) => {
-
-  try {
-    await store.deleteNote(id);
-    selectedNote.value = null;
-  } catch (error) {
-    console.log();
-  }
-};
-
-const openNoteModal = (note) => {
-  selectedNote.value = note;
-};
-
-const closeNoteModal = () => {
-  selectedNote.value = null;
 };
 
 onMounted(() => {

@@ -12,6 +12,7 @@ export default defineConfig({
     emptyOutDir: false,
   },
   server: {
+    host: true,
     port: 8080,
   },
   plugins: [

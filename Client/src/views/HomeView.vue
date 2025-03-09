@@ -87,6 +87,7 @@ const createNote = async (type) => {
     type,
     ...(type === 'todo' ? { items: [] } : {})
   };
+
   await store.addNote(newNote);
   selectedNote.value = newNote;
 

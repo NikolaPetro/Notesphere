@@ -3,6 +3,7 @@ import express from 'express';
 import path from 'path';
 import morgan from 'morgan';
 import cors from 'cors';
+import bodyParser from 'body-parser';
 
 import { errorHandler, notFoundHandler } from './error/errorHandler.js';
 import routes from './api/routes/routes.js';
@@ -16,7 +17,8 @@ app.use(cors());
 app.use(morgan('tiny'));
 app.use(express.static(path.join(dirname, '/public')));
 
-app.use(express.json());
+app.use(bodyParser.json({ limit: '5mb' }));
+app.use(bodyParser.urlencoded({ limit: '5mb', extended: true }));
 
 app.use('/notes', routes);
 app.use(notFoundHandler);

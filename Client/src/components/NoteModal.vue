@@ -43,7 +43,7 @@
                 color="negative"
                 icon="delete"
                 size="sm"
-                @click="removeImage"
+                @click="editedNote.image = null"
               />
             </div>
           </q-img>
@@ -60,15 +60,15 @@
               direction="right"
               color="primary"
             >
-              <!-- <q-fab-action
-                color="primary"
-                icon="attach_file"
+              <q-fab-action
+                  color="primary"
+                icon="image"
                 @click="triggerFileInput"
-              /> -->
+              /> 
               <q-fab-action
                 color="primary"
                 icon="photo_camera"
-                @click="openCamera"
+                @click="showCamera = true"
               />
               <q-fab-action
                 color="primary"
@@ -80,20 +80,19 @@
         <q-card-actions position="bottom-right">
          
      
-          <q-btn flat color="negative" label="Delete" @click="deleteNote" />
+          <q-btn flat color="negative" label="Delete" @click="store.deleteNote(editedNote.id)" />
           <q-btn flat color="primary" label="Save" @click="saveNote" />
           
         </q-card-actions>
       </q-card-section>
     </q-card>
-<!-- 
+
     <input
       type="file"
       ref="fileInput"
-      accept="image/*"
       style="display: none"
       @change="handleFileUpload"
-    > -->
+    >
 
     <q-dialog v-model="showCamera">
       <camera-preview
@@ -161,36 +160,27 @@ const saveNote = async () => {
   showModal.value = false
 }
 
-const deleteNote = () => {
-  store.deleteNote(editedNote.id)
-  showModal.value = false
-}
-
 const triggerFileInput = () => {
   fileInput.value.click()
 }
 
-// const handleFileUpload = async (event) => {
-//   const file = event.target.files[0]
-//   if (file) {
-//     const reader = new FileReader()
-//     reader.onload = async (e) => {
-//       const imageBlob = e.target.result
-//       const imagePath = await store.uploadImage(imageBlob)
-//       if (imagePath) {
-//         editedNote.image = imagePath
-//       }
-//     }
-//     reader.readAsDataURL(file)
-//   }
-// }
-
-const removeImage = () => {
-  editedNote.image = null
-}
-
-const openCamera = () => {
-  showCamera.value = true
+const handleFileUpload = async (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    const reader = new FileReader()
+    reader.onload = async (e) => {
+      const fileData = e.target.result
+      if (file.type.startsWith('image/')) {
+        editedNote.image = fileData 
+      } else if (file.type.startsWith('audio/')) {
+        const audioBlob = new Blob([fileData], { type: file.type })
+        editedNote.voiceMemo = URL.createObjectURL(audioBlob)
+      } else {
+        console.log('Uploaded file type not supported for display:', file.type)
+      }
+    }
+    reader.readAsDataURL(file)
+  }
 }
 
 const handleCameraCapture = (imageData) => {
@@ -219,7 +209,7 @@ const toggleRecording = async () => {
       console.error('Error accessing microphone:', error)
       $q.notify({
         color: 'negative',
-        message: 'Error accessing microphone. Please check your permissions.'
+        message: 'Error accessing microphone.'
       })
     }
   }

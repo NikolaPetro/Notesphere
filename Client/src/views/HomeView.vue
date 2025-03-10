@@ -82,6 +82,7 @@ const createNote = async (type) => {
   creatingNote.value = true;
 
   const newNote = {
+    id: Date.now(),
     title: '',
     content: '',
     type,

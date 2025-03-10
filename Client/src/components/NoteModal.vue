@@ -80,7 +80,7 @@
         <q-card-actions position="bottom-right">
          
      
-          <q-btn flat color="negative" label="Delete" @click="store.deleteNote(editedNote.id)" />
+          <q-btn flat color="negative" label="Delete" v-close-popup @click="store.deleteNote(editedNote.id)"  />
           <q-btn flat color="primary" label="Save" @click="saveNote" />
           
         </q-card-actions>

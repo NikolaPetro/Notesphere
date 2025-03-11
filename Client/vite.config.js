@@ -32,7 +32,35 @@ export default defineConfig({
               cacheName: 'NotesCache',
               expiration: {
                 maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24 * 1, // <== 1 day
+                maxAgeSeconds: 60 * 60 * 24 * 1,
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+          {
+            urlPattern: new RegExp('^http://localhost:3000/notes'),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'NotesApiCache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 1,
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+          {
+            urlPattern: ({ request }) => request.destination === 'image',
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'noteImages',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 30,
               },
               cacheableResponse: {
                 statuses: [0, 200],
@@ -54,11 +82,11 @@ export default defineConfig({
   },
   preview: {
     port: 4175,
-    proxy: {
-      '/': {
-        target: 'http://localhost:3000/',
-        changeOrigin: true
-      },
-    },
+    // proxy: {
+    //   '/': {
+    //     target: 'http://localhost:3000/',
+    //     changeOrigin: true
+    //   },
+    // },
   },
 });

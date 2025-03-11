@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import axios from 'axios';
+
 export const useStore = defineStore('NoteStore', () => {
   const notes = ref([]);
 
@@ -25,11 +26,13 @@ export const useStore = defineStore('NoteStore', () => {
     await fetchNotes();
   }
 
-  // New method to upload an image
   async function uploadImage(imageBlob) {
     const formData = new FormData();
     formData.append('image', imageBlob, `note-image-${Date.now()}.jpg`);
-
+    
+    // Add a specific path parameter to tell the server where to save the image
+    formData.append('uploadPath', '/public/images');
+    
     try {
       const { data } = await axios.post('http://localhost:3000/upload', formData);
       return data.filePath;

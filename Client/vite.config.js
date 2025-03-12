@@ -8,7 +8,7 @@ import { quasar, transformAssetUrls } from '@quasar/vite-plugin';
 
 export default defineConfig({
   build: {
-    outDir: '../server/public',
+    outDir: '../Server/public',
     emptyOutDir: false,
   },
   server: {
@@ -21,7 +21,7 @@ export default defineConfig({
     }),
     VitePWA({
       manifest,
-      includeAssets: ['**/*.{js,css,html,ico,jpg,png,svg,ttf,jpeg}'],
+      includeAssets: ['**/*.{js,css,html,ico,jpg,png,svg,ttf,jpeg}', 'icons/*.{png,jpg,svg}'],
       workbox: {
         mode: 'development',
         runtimeCaching: [
@@ -40,24 +40,10 @@ export default defineConfig({
             },
           },
           {
-            urlPattern: new RegExp('^http://localhost:3000/notes'),
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'NotesApiCache',
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24 * 1,
-              },
-              cacheableResponse: {
-                statuses: [0, 200],
-              },
-            },
-          },
-          {
             urlPattern: ({ request }) => request.destination === 'image',
             handler: 'CacheFirst',
             options: {
-              cacheName: 'noteImages',
+              cacheName: 'icon-cache',
               expiration: {
                 maxEntries: 100,
                 maxAgeSeconds: 60 * 60 * 24 * 30,

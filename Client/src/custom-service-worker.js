@@ -21,13 +21,18 @@ const NotesRoute = new Route(
     },
   }),
 );
-const fonRoute = new Route(
-  ({ url }) => /.*assets\/.*.woff/.test(url.pathname),
+
+const fontAndIconRoute = new Route(
+  ({ url }) => {
+    return /.*\.(woff|woff2|ttf|eot|svg)/.test(url.pathname) || 
+           url.pathname.includes('@quasar/extras/material-icons') || 
+           url.pathname.includes('@quasar/extras/fontawesome-v6');
+  },
   new CacheFirst({
-    cacheName: 'fon-cache',
+    cacheName: 'font-icon-cache',
     plugins: [
       new ExpirationPlugin({
-        maxAgeSeconds: 60 * 60 * 24 * 1,
+        maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
       }),
     ],
     cacheableResponse: {
@@ -35,5 +40,24 @@ const fonRoute = new Route(
     },
   }),
 );
+
+// Route for CSS files that might contain icon references
+const cssRoute = new Route(
+  ({ url }) => url.pathname.endsWith('.css'),
+  new CacheFirst({
+    cacheName: 'css-cache',
+    plugins: [
+      new ExpirationPlugin({
+        maxAgeSeconds: 60 * 60 * 24 * 7, // 7 days
+      }),
+    ],
+    cacheableResponse: {
+      statuses: [0, 200],
+    },
+  }),
+);
+
+// Register all routes
 registerRoute(NotesRoute);
-registerRoute(fonRoute);
+registerRoute(fontAndIconRoute);
+registerRoute(cssRoute);

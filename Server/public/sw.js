@@ -67,7 +67,7 @@ if (!self.define) {
     });
   };
 }
-define(['./workbox-e21a23a0'], (function (workbox) { 'use strict';
+define(['./workbox-18b6bf37'], (function (workbox) { 'use strict';
 
   self.addEventListener('message', event => {
     if (event.data && event.data.type === 'SKIP_WAITING') {
@@ -85,6 +85,9 @@ define(['./workbox-e21a23a0'], (function (workbox) { 'use strict';
     "revision": null
   }, {
     "url": "assets/AboutView-2Fv8DC8i.js",
+    "revision": null
+  }, {
+    "url": "assets/AboutView-39mAELgv.js",
     "revision": null
   }, {
     "url": "assets/AboutView-3ffKxOnd.js",
@@ -228,6 +231,9 @@ define(['./workbox-e21a23a0'], (function (workbox) { 'use strict';
     "url": "assets/AboutView-LYMpi5TU.js",
     "revision": null
   }, {
+    "url": "assets/AboutView-MBBf0mPq.js",
+    "revision": null
+  }, {
     "url": "assets/AboutView-mKKlAR9z.js",
     "revision": null
   }, {
@@ -286,6 +292,9 @@ define(['./workbox-e21a23a0'], (function (workbox) { 'use strict';
     "revision": null
   }, {
     "url": "assets/AboutView-x9tqObsz.js",
+    "revision": null
+  }, {
+    "url": "assets/AboutView-xcBtpv7R.js",
     "revision": null
   }, {
     "url": "assets/AboutView-xNMnCOHq.js",
@@ -603,6 +612,12 @@ define(['./workbox-e21a23a0'], (function (workbox) { 'use strict';
     "url": "assets/HomeView-QMYroeqT.js",
     "revision": null
   }, {
+    "url": "assets/HomeView-QqbekX0T.js",
+    "revision": null
+  }, {
+    "url": "assets/HomeView-REK9mPUG.js",
+    "revision": null
+  }, {
     "url": "assets/HomeView-Rj0IS6f3.css",
     "revision": null
   }, {
@@ -610,6 +625,9 @@ define(['./workbox-e21a23a0'], (function (workbox) { 'use strict';
     "revision": null
   }, {
     "url": "assets/HomeView-sAnVlm3L.js",
+    "revision": null
+  }, {
+    "url": "assets/HomeView-SmLdu8QS.css",
     "revision": null
   }, {
     "url": "assets/HomeView-SpigIMhR.css",
@@ -684,6 +702,9 @@ define(['./workbox-e21a23a0'], (function (workbox) { 'use strict';
     "url": "assets/HomeView-x3-tRnBG.js",
     "revision": null
   }, {
+    "url": "assets/HomeView-X9iwO8yH.js",
+    "revision": null
+  }, {
     "url": "assets/HomeView-XeC-ejsd.css",
     "revision": null
   }, {
@@ -712,6 +733,9 @@ define(['./workbox-e21a23a0'], (function (workbox) { 'use strict';
     "revision": null
   }, {
     "url": "assets/index--GrIIul2.js",
+    "revision": null
+  }, {
+    "url": "assets/index-0IAnF_3u.js",
     "revision": null
   }, {
     "url": "assets/index-0w2zjJTu.js",
@@ -822,6 +846,9 @@ define(['./workbox-e21a23a0'], (function (workbox) { 'use strict';
     "url": "assets/index-lB4fko9b.js",
     "revision": null
   }, {
+    "url": "assets/index-lOq4AUPl.css",
+    "revision": null
+  }, {
     "url": "assets/index-LWbj-KF-.js",
     "revision": null
   }, {
@@ -924,6 +951,9 @@ define(['./workbox-e21a23a0'], (function (workbox) { 'use strict';
     "url": "assets/index-vc5aXOG9.js",
     "revision": null
   }, {
+    "url": "assets/index-vfZDrC2D.js",
+    "revision": null
+  }, {
     "url": "assets/index-w46igQhY.css",
     "revision": null
   }, {
@@ -931,6 +961,9 @@ define(['./workbox-e21a23a0'], (function (workbox) { 'use strict';
     "revision": null
   }, {
     "url": "assets/index-Wr5XhTmO.js",
+    "revision": null
+  }, {
+    "url": "assets/index-WzHMKyiC.js",
     "revision": null
   }, {
     "url": "assets/index-XOBGvqLO.js",
@@ -964,7 +997,7 @@ define(['./workbox-e21a23a0'], (function (workbox) { 'use strict';
     "revision": "379f6a4e5451d9243ffed3faed64e240"
   }, {
     "url": "index.html",
-    "revision": "5a772a0993d4c94c2e578eec9945fe84"
+    "revision": "a17f537e45cf8eecf613feedbaaad46e"
   }, {
     "url": "registerSW.js",
     "revision": "1872c500de691dce40960bb85481de07"
@@ -1006,6 +1039,17 @@ define(['./workbox-e21a23a0'], (function (workbox) { 'use strict';
     plugins: [new workbox.ExpirationPlugin({
       maxEntries: 50,
       maxAgeSeconds: 86400
+    }), new workbox.CacheableResponsePlugin({
+      statuses: [0, 200]
+    })]
+  }), 'GET');
+  workbox.registerRoute(({
+    request
+  }) => request.destination === "image", new workbox.CacheFirst({
+    "cacheName": "icon-cache",
+    plugins: [new workbox.ExpirationPlugin({
+      maxEntries: 100,
+      maxAgeSeconds: 2592000
     }), new workbox.CacheableResponsePlugin({
       statuses: [0, 200]
     })]

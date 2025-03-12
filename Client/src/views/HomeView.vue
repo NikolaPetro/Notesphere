@@ -60,22 +60,34 @@
     />
   </q-page>
 </template>
+
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useStore } from '../stores/usestore';
 import NoteCard from '../components/NoteCard.vue';
 import NoteModal from '../components/NoteModal.vue';
+
 const store = useStore();
 const searchTerm = ref('');
 const selectedNote = ref(null);
-const viewType = ref('grid');
+const viewType = ref('grid'); // Default view type
 const creatingNote = ref(false);
+
+const setDefaultViewType = () => {
+  if (window.innerWidth <= 768) { // Adjust the width as needed for mobile
+    viewType.value = 'list'; // Set to list view on mobile
+  } else {
+    viewType.value = 'grid'; // Set to grid view on larger screens
+  }
+};
+
 const filteredNotes = computed(() => {
   const searchRegex = new RegExp(searchTerm.value, 'i');
   return store.notes.filter(note =>
     searchRegex.test(note.title) || searchRegex.test(note.content)
   );
 });
+
 const createNote = async (type) => {
   if (creatingNote.value) return;
   creatingNote.value = true;
@@ -90,8 +102,16 @@ const createNote = async (type) => {
   selectedNote.value = newNote;
   creatingNote.value = false;
 };
+
 onMounted(() => {
   store.fetchNotes();
+  setDefaultViewType(); // Set the default view type on mount
+  window.addEventListener('resize', setDefaultViewType); // Update on resize
+});
+
+// Clean up the event listener when the component is unmounted
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', setDefaultViewType);
 });
 </script>
 

@@ -67,11 +67,11 @@ export default defineConfig({
   },
   preview: {
     port: 4175,
-    // proxy: {
-    //   '/': {
-    //     target: 'http://localhost:3000/',
-    //     changeOrigin: true
-    //   },
-    // },
+    proxy: {
+      '/': {
+        target: 'http://localhost:3000/',
+        changeOrigin: true
+      },
+    },
   },
 });

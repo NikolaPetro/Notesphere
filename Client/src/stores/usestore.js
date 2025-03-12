@@ -4,7 +4,7 @@ import axios from 'axios';
 
 export const useStore = defineStore('NoteStore', () => {
     const notes = ref([]);
-    const apiUrl = 'http://localhost:3000';
+   const apiUrl = 'http://localhost:3000';
 
     async function fetchNotes() {
         try {

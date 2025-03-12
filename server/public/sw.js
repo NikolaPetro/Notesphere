@@ -67,9 +67,7 @@ if (!self.define) {
     });
   };
 }
-
 define(['./workbox-18b6bf37'], (function (workbox) { 'use strict';
-
 
   self.addEventListener('message', event => {
     if (event.data && event.data.type === 'SKIP_WAITING') {
@@ -83,26 +81,23 @@ define(['./workbox-18b6bf37'], (function (workbox) { 'use strict';
    * See https://goo.gl/S9QRab
    */
   workbox.precacheAndRoute([{
-    "url": "assets/AboutView-h2-4UBYj.js",
+    "url": "assets/AboutView-_BEgq-3S.js",
     "revision": null
   }, {
-    "url": "assets/HomeView-HMP8i-yP.js",
+    "url": "assets/HomeView-J9tuVAnd.css",
     "revision": null
   }, {
-    "url": "assets/HomeView-r7PcXbh6.css",
+    "url": "assets/HomeView-NKIlqMAu.js",
     "revision": null
   }, {
-    "url": "assets/index-NIGbO0bZ.js",
-
+    "url": "assets/index-g67jia64.css",
     "revision": null
   }, {
-    "url": "assets/index-S90njQkI.css",
+    "url": "assets/index-m1D20lmg.js",
     "revision": null
   }, {
     "url": "index.html",
-
-    "revision": "bc80f44a93fc1e9cc66ea687432d686d"
-
+    "revision": "529ad19c80b1d10a551614194fb1b2cf"
   }, {
     "url": "registerSW.js",
     "revision": "1872c500de691dce40960bb85481de07"
@@ -148,7 +143,6 @@ define(['./workbox-18b6bf37'], (function (workbox) { 'use strict';
       statuses: [0, 200]
     })]
   }), 'GET');
-
   workbox.registerRoute(/^http:\/\/localhost:3000\/notes/, new workbox.NetworkFirst({
     "cacheName": "NotesApiCache",
     plugins: [new workbox.ExpirationPlugin({
@@ -169,6 +163,5 @@ define(['./workbox-18b6bf37'], (function (workbox) { 'use strict';
       statuses: [0, 200]
     })]
   }), 'GET');
-
 
 }));

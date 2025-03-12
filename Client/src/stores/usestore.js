@@ -18,7 +18,6 @@ export const useStore = defineStore('NoteStore', () => {
   async function addNote(note) {
     try {
       const noteToSave = { ...note };
-      // Change type to tags to match the backend model
       if (noteToSave.type) {
         noteToSave.tags = noteToSave.type;
         delete noteToSave.type;
@@ -36,7 +35,6 @@ export const useStore = defineStore('NoteStore', () => {
   async function updateNote(id, updatedNote) {
     try {
       const noteToUpdate = { ...updatedNote };
-      // Change type to tags to match the backend model
       if (noteToUpdate.type) {
         noteToUpdate.tags = noteToUpdate.type;
         delete noteToUpdate.type;
@@ -44,7 +42,6 @@ export const useStore = defineStore('NoteStore', () => {
       
       const { data } = await axios.patch(`${apiUrl}/notes/${id}`, noteToUpdate);
       
-      // Update local state without fetching all notes again
       const index = notes.value.findIndex(note => note.id === id);
       if (index !== -1) {
         notes.value[index] = data;
@@ -72,9 +69,6 @@ export const useStore = defineStore('NoteStore', () => {
   async function uploadImage(imageBlob) {
     const formData = new FormData();
     formData.append('image', imageBlob, `note-image-${Date.now()}.jpg`);
-    
-    // Add a specific path parameter to tell the server where to save the image
-    formData.append('uploadPath', '/public/images');
     
     try {
       const formData = new FormData();

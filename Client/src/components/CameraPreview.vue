@@ -3,7 +3,7 @@
     <q-card-section class="q-pb-none">
       <div class="text-h6 text-white q-mb-md">Camera</div>
       <div class="camera-container">
-        <video ref="videoElement" autoplay playsinline class="full-width"></video>
+      <video ref="videoElement" autoplay playsinline class="full-width"></video>
       </div>
     </q-card-section>
     <q-card-actions align="right" class="q-pa-md">

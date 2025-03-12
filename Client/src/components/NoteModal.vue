@@ -97,6 +97,7 @@
       ref="fileInput"
       style="display: none"
       @change="handleFileUpload"
+      accept="image/*,audio/*"
     >
 
     <q-dialog v-model="showCamera">
@@ -152,17 +153,48 @@ const isNoteEmpty = (note) => {
     note.content.trim() === '' &&
     !note.image &&
     !note.voiceMemo &&
-    (note.type !== 'todo' || (note.items && note.items.every(item => item.text.trim() === '')))
+    (note.tags !== 'todo' || (note.items && note.items.every(item => item.text.trim() === '')))
   )
 }
 
 const saveNote = async () => {
-  if (editedNote.id) {
-    await store.updateNote(editedNote.id, editedNote)
-  } else {
-    await store.addNote(editedNote)
+  try {
+    // Upload any pending file data before saving
+    if (editedNote.pendingImageFile) {
+      const imageUrl = await store.uploadFile(editedNote.pendingImageFile, 'image')
+      if (imageUrl) {
+        editedNote.image = imageUrl
+      }
+      delete editedNote.pendingImageFile
+    }
+    
+    if (editedNote.pendingAudioBlob) {
+      // Convert blob to File object
+      const audioFile = new File(
+        [editedNote.pendingAudioBlob], 
+        `voice-memo-${Date.now()}.webm`, 
+        { type: 'audio/webm' }
+      )
+      const audioUrl = await store.uploadFile(audioFile, 'audio')
+      if (audioUrl) {
+        editedNote.voiceMemo = audioUrl
+      }
+      delete editedNote.pendingAudioBlob
+    }
+    
+    if (editedNote.id) {
+      await store.updateNote(editedNote.id, editedNote)
+    } else {
+      await store.addNote(editedNote)
+    }
+    showModal.value = false
+  } catch (error) {
+    console.error('Error saving note:', error)
+    $q.notify({
+      color: 'negative',
+      message: 'Failed to save note. Please try again.'
+    })
   }
-  showModal.value = false
 }
 
 const triggerFileInput = () => {
@@ -172,24 +204,43 @@ const triggerFileInput = () => {
 const handleFileUpload = async (event) => {
   const file = event.target.files[0]
   if (file) {
-    const reader = new FileReader()
-    reader.onload = async (e) => {
-      const fileData = e.target.result
-      if (file.type.startsWith('image/')) {
-        editedNote.image = fileData 
-      } else if (file.type.startsWith('audio/')) {
-        const audioBlob = new Blob([fileData], { type: file.type })
-        editedNote.voiceMemo = URL.createObjectURL(audioBlob)
-      } else {
-        console.log('Uploaded file type not supported for display:', file.type)
+    if (file.type.startsWith('image/')) {
+      // Store the file object for later upload
+      editedNote.pendingImageFile = file
+      
+      // Create a preview
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        editedNote.image = e.target.result // This is just for preview
       }
+      reader.readAsDataURL(file)
+    } else if (file.type.startsWith('audio/')) {
+      // Store the file for later upload
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const audioBlob = new Blob([e.target.result], { type: file.type })
+        editedNote.pendingAudioBlob = audioBlob
+        editedNote.voiceMemo = URL.createObjectURL(audioBlob) // Just for preview
+      }
+      reader.readAsArrayBuffer(file)
+    } else {
+      console.log('Uploaded file type not supported for display:', file.type)
     }
-    reader.readAsDataURL(file)
   }
 }
 
-const handleCameraCapture = (imageData) => {
-  editedNote.image = imageData
+const handleCameraCapture = async (imageData) => {
+  // Convert base64 to blob
+  const response = await fetch(imageData)
+  const blob = await response.blob()
+  
+  // Create a File object from the blob
+  const file = new File([blob], `camera-capture-${Date.now()}.jpg`, { type: 'image/jpeg' })
+  
+  // Store for upload on save
+  editedNote.pendingImageFile = file
+  editedNote.image = imageData // For preview
+  
   showCamera.value = false
 }
 
@@ -200,14 +251,18 @@ const toggleRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       mediaRecorder.value = new MediaRecorder(stream)
+      audioChunks.value = []
+      
       mediaRecorder.value.ondataavailable = (event) => {
         audioChunks.value.push(event.data)
       }
+      
       mediaRecorder.value.onstop = () => {
         const audioBlob = new Blob(audioChunks.value, { type: 'audio/webm' })
-        editedNote.voiceMemo = URL.createObjectURL(audioBlob)
-        audioChunks.value = []
+        editedNote.pendingAudioBlob = audioBlob
+        editedNote.voiceMemo = URL.createObjectURL(audioBlob) // For preview
       }
+      
       mediaRecorder.value.start()
       recording.value = true
     } catch (error) {
@@ -224,6 +279,11 @@ const stopRecording = () => {
   if (mediaRecorder.value && mediaRecorder.value.state !== 'inactive') {
     mediaRecorder.value.stop()
     recording.value = false
+    
+    // Close audio tracks to release the microphone
+    if (mediaRecorder.value && mediaRecorder.value.stream) {
+      mediaRecorder.value.stream.getTracks().forEach(track => track.stop())
+    }
   }
 }
 
@@ -243,6 +303,7 @@ onUnmounted(() => {
   max-width: 400px;
   width: 100%;
 }
+
 
 .note-modal-card {
   background-color: #1e1e1e !important;
@@ -292,4 +353,5 @@ onUnmounted(() => {
     }
   }
 }
+
 </style>

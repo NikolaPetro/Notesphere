@@ -78,15 +78,13 @@ const props = defineProps({
 }
 
 .ellipsis {
-  display: -webkit-box; 
-  display: box; 
-  -webkit-box-orient: vertical; 
-  box-orient: vertical; 
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-clamp: 3; 
-  max-height: 180px; 
+  
 }
+
 
 .audio-preview {
   display: flex;

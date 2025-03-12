@@ -1,30 +1,55 @@
-import { query } from '../../db/index.js'; 
-const getAll = async () => {
-  const { rows } = await query('SELECT * FROM notes;');
-  return rows;
+import fs from 'fs/promises';
+import path from 'path';
+
+const getNotesFilePath = () => path.join(process.cwd(), 'data', 'notes.json');
+
+const getNotes = async () => {
+  const notesData = await fs.readFile(getNotesFilePath(), 'utf8');
+  const { notes } = JSON.parse(notesData);
+  return notes;
 };
 
-const createNote = async (note) => {
-  const { title, content, type } = note;
-  const { rows } = await query(
-    'INSERT INTO notes (title, content, tags) VALUES ($1, $2, $3) RETURNING *',
-    [title, content, type]
-  );
-  return rows[0];
+const createNote = async (noteData) => {
+  const notes = await getNotes();
+  const newNote = {
+    id: notes.length > 0 ? Math.max(...notes.map(note => note.id)) + 1 : 1,
+    ...noteData,
+    created_at: new Date().toISOString()
+  };
+  
+  notes.push(newNote);
+  await fs.writeFile(getNotesFilePath(), JSON.stringify({ notes }, null, 2));
+  return newNote;
 };
 
-const updateNote = async (id, updatedNote) => {
-  const { title, content, tags } = updatedNote;
-  const { rows } = await query(
-    'UPDATE notes SET title = $1, content = $2, tags = $3 WHERE id = $4 RETURNING *',
-    [title, content, tags, id]
-  );
-  return rows[0];
+const updateNote = async (id, updateData) => {
+  const notes = await getNotes();
+  const index = notes.findIndex(note => note.id === parseInt(id));
+  
+  if (index === -1) {
+    throw new Error('Note not found');
+  }
+  
+  notes[index] = {
+    ...notes[index],
+    ...updateData,
+    id: parseInt(id) 
+  };
+  
+  await fs.writeFile(getNotesFilePath(), JSON.stringify({ notes }, null, 2));
+  return notes[index];
 };
 
 const deleteNote = async (id) => {
-  const { rows } = await query('DELETE FROM notes WHERE id = $1 RETURNING *', [id]);
-  return rows[0];
+  const notes = await getNotes();
+  const filteredNotes = notes.filter(note => note.id !== parseInt(id));
+  
+  if (filteredNotes.length === notes.length) {
+    throw new Error('Note not found');
+  }
+  
+  await fs.writeFile(getNotesFilePath(), JSON.stringify({ notes: filteredNotes }, null, 2));
+  return true;
 };
 
-export { getAll, createNote, updateNote, deleteNote };
+export { getNotes, createNote, updateNote, deleteNote };

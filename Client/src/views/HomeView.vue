@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="notes-page">
+  <q-page paddingn class="notes-page">
     <div class="row q-col-gutter-md">
       <div class="col-12">
         <q-input
@@ -47,12 +47,10 @@
             :note="note"
             :is-list-view="viewType === 'list'"
             @click="selectedNote = note"
-            class="note-card"
           />
         </div>
       </template>
     </div>
-    
     <note-modal
       v-if="selectedNote"
       :note="selectedNote"
@@ -62,30 +60,25 @@
     />
   </q-page>
 </template>
-
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useStore } from '../stores/usestore';
 import NoteCard from '../components/NoteCard.vue';
 import NoteModal from '../components/NoteModal.vue';
-
 const store = useStore();
 const searchTerm = ref('');
 const selectedNote = ref(null);
 const viewType = ref('grid');
 const creatingNote = ref(false);
-
 const filteredNotes = computed(() => {
   const searchRegex = new RegExp(searchTerm.value, 'i');
   return store.notes.filter(note =>
     searchRegex.test(note.title) || searchRegex.test(note.content)
   );
 });
-
 const createNote = async (type) => {
   if (creatingNote.value) return;
   creatingNote.value = true;
-  
   const newNote = {
     id: Date.now(),
     title: '',
@@ -95,10 +88,8 @@ const createNote = async (type) => {
   };
   await store.addNote(newNote);
   selectedNote.value = newNote;
-  
   creatingNote.value = false;
 };
-
 onMounted(() => {
   store.fetchNotes();
 });
@@ -130,6 +121,7 @@ onMounted(() => {
 }
 
 .view-toggle {
+  background-color: #1e1e1e;
   border-radius: 8px;
   overflow: hidden;
   

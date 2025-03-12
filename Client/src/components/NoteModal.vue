@@ -8,7 +8,7 @@
     :maximized="false"
     :style="{ width: '400px', height: '700px', maxWidth: '90%', maxHeight: '90%' }"
   >
-    <q-card class="column note-modal-card bg-dark">
+  <q-card class="column note-modal-card bg-dark">
       <q-card-section class="row items-center q-pb-none">
         <div class="text-h6 text-white">{{ editedNote.title || 'Untitled' }}</div>
         <q-space />
@@ -105,18 +105,22 @@
     </q-dialog>
   </q-dialog>
 </template>
+
 <script setup>
 import { ref, reactive, onMounted, onUnmounted, watch } from 'vue'
 import { useQuasar } from 'quasar'
 import CameraPreview from '../components/CameraPreview.vue'
 import { useStore } from '../stores/usestore.js'
+
 const props = defineProps({
   note: {
     type: Object,
     required: true
   }
 })
+
 const emit = defineEmits(['update', 'delete', 'close'])
+
 const $q = useQuasar()
 const showModal = ref(true)
 const editedNote = reactive({ ...props.note })
@@ -126,17 +130,36 @@ const recording = ref(false)
 const mediaRecorder = ref(null)
 const audioChunks = ref([])
 const store = useStore()
+
 watch(() => props.note, (newNote) => {
   Object.assign(editedNote, newNote)
 })
+
+// Request notification permission on component mount
+onMounted(() => {
+  if (Notification.permission !== 'granted') {
+    Notification.requestPermission();
+  }
+})
+
+// Function to show notification
+const showNotification = (message) => {
+  if (Notification.permission === 'granted') {
+    new Notification(message);
+  }
+}
+
 const closeModal = () => {
   if (isNoteEmpty(editedNote)) {
     emit('delete', editedNote.id)
+    showNotification('Note deleted successfully!') // Notification on delete
   } else {
     emit('update', editedNote)
+    showNotification('Note saved successfully!') // Notification on save
   }
   emit('close')
 }
+
 const isNoteEmpty = (note) => {
   return (
     note.title.trim() === '' &&
@@ -146,17 +169,22 @@ const isNoteEmpty = (note) => {
     (note.type !== 'todo' || (note.items && note.items.every(item => item.text.trim() === '')))
   )
 }
+
 const saveNote = async () => {
   if (editedNote.id) {
     await store.updateNote(editedNote.id, editedNote)
+    showNotification('Note updated successfully!') // Notification on update
   } else {
     await store.addNote(editedNote)
+    showNotification('Note added successfully!') // Notification on add
   }
   showModal.value = false
 }
+
 const triggerFileInput = () => {
   fileInput.value.click()
 }
+
 const handleFileUpload = async (event) => {
   const file = event.target.files[0]
   if (file) {
@@ -173,12 +201,15 @@ const handleFileUpload = async (event) => {
       }
     }
     reader.readAsDataURL(file)
+    showNotification('File uploaded successfully!') // Notification on file upload
   }
 }
+
 const handleCameraCapture = (imageData) => {
   editedNote.image = imageData
   showCamera.value = false
 }
+
 const toggleRecording = async () => {
   if (recording.value) {
     stopRecording()
@@ -205,26 +236,31 @@ const toggleRecording = async () => {
     }
   }
 }
+
 const stopRecording = () => {
   if (mediaRecorder.value && mediaRecorder.value.state !== 'inactive') {
     mediaRecorder.value.stop()
     recording.value = false
   }
 }
+
 onMounted(() => {
   window.addEventListener('beforeunload', stopRecording)
 })
+
 onUnmounted(() => {
   window.removeEventListener('beforeunload', stopRecording)
   stopRecording()
 })
 </script>
+
 <style lang="scss" scoped>
 .q-dialog__inner > div {
   overflow: hidden;
   max-width: 400px;
   width: 100%;
 }
+
 .note-modal-card {
   background-color: #1e1e1e !important;
   border: 1px solid #333;
@@ -234,6 +270,7 @@ onUnmounted(() => {
     color: #e0e0e0;
   }
 }
+
 .dark-input {
   .q-field__control {
     background-color: #2a2a2a !important;
@@ -250,6 +287,7 @@ onUnmounted(() => {
     }
   }
 }
+
 .audio-player {
   background-color: #2a2a2a;
   border-radius: 8px;
@@ -259,6 +297,7 @@ onUnmounted(() => {
     filter: invert(0.8);
   }
 }
+
 :deep(.q-fab) {
   .q-fab__icon-holder {
     transition: all 0.3s ease;

@@ -6,13 +6,13 @@
     transition-show="slide-up"
     transition-hide="slide-down"
     :maximized="false"
-    :style="{ width: '400px',height: '700px', maxWidth: '90%', maxHeight: '90%' }"
+    :style="{ width: '400px', height: '700px', maxWidth: '90%', maxHeight: '90%' }"
   >
-    <q-card class="column" style="max-width: 400px;">
+    <q-card class="column note-modal-card bg-dark">
       <q-card-section class="row items-center q-pb-none">
-        <div class="text-h6">{{ editedNote.title || 'Untitled' }}</div>
+        <div class="text-h6 text-white">{{ editedNote.title || 'Untitled' }}</div>
         <q-space />
-        <q-btn icon="close" flat round dense v-close-popup />
+        <q-btn icon="close" flat round dense v-close-popup color="grey-5" />
       </q-card-section>
 
       <q-card-section class="q-pa-sm flex-grow-1 overflow-auto">
@@ -21,23 +21,30 @@
           label="Title"
           dense
           autofocus
-          class="q-mb-md"
+          class="q-mb-md dark-input"
+          dark
+          outlined
+          color="primary"
         />
 
-          <q-input
-            v-model="editedNote.content"
-            type="textarea"
-            label="Content"
-            autogrow
-          />
+        <q-input
+          v-model="editedNote.content"
+          type="textarea"
+          label="Content"
+          autogrow
+          dark
+          outlined
+          color="primary"
+          class="dark-input"
+        />
 
-        <div v-if="editedNote.image" class="q-mt-md">
+        <div v-if="editedNote.image" class="q-mt-md rounded-borders overflow-hidden">
           <q-img
             :src="editedNote.image"
             spinner-color="primary"
             style="max-height: 1000px"
           >
-            <div class="absolute-top-right">
+            <div class="absolute-top-right q-mt-xs q-mr-xs">
               <q-btn
                 round
                 color="negative"
@@ -49,40 +56,38 @@
           </q-img>
         </div>
 
-        <div v-if="editedNote.voiceMemo" class="q-mt-md">
+        <div v-if="editedNote.voiceMemo" class="q-mt-md audio-player">
           <audio :src="editedNote.voiceMemo" controls class="full-width" />
         </div>
       
 
         <div class="q-mt-md q-mb-md q-ml-auto" position="bottom-left">
-            <q-fab
-              icon="add"
-              direction="right"
+          <q-fab
+            icon="add"
+            direction="right"
+            color="primary"
+            padding="sm"
+          >
+            <q-fab-action
               color="primary"
-            >
-              <q-fab-action
-                  color="primary"
-                icon="image"
-                @click="triggerFileInput"
-              /> 
-              <q-fab-action
-                color="primary"
-                icon="photo_camera"
-                @click="showCamera = true"
-              />
-              <q-fab-action
-                color="primary"
-                :icon="recording ? 'stop' : 'mic'"
-                @click="toggleRecording"
-              />
-            </q-fab>
-          </div>
-        <q-card-actions position="bottom-right">
-         
-     
-          <q-btn flat color="negative" label="Delete" v-close-popup @click="store.deleteNote(editedNote.id)"  />
+              icon="image"
+              @click="triggerFileInput"
+            /> 
+            <q-fab-action
+              color="primary"
+              icon="photo_camera"
+              @click="showCamera = true"
+            />
+            <q-fab-action
+              :icon="recording ? 'stop' : 'mic'"
+              @click="toggleRecording"
+              :color="recording ? 'negative' : 'primary'"
+            />
+          </q-fab>
+        </div>
+        <q-card-actions position="bottom-right" class="q-mt-auto">
+          <q-btn flat color="negative" label="Delete" v-close-popup @click="store.deleteNote(editedNote.id)" />
           <q-btn flat color="primary" label="Save" @click="saveNote" />
-          
         </q-card-actions>
       </q-card-section>
     </q-card>
@@ -298,4 +303,55 @@ onUnmounted(() => {
   max-width: 400px;
   width: 100%;
 }
+
+
+.note-modal-card {
+  background-color: #1e1e1e !important;
+  border: 1px solid #333;
+  border-radius: 8px;
+  
+  .q-card-section {
+    color: #e0e0e0;
+  }
+}
+
+.dark-input {
+  .q-field__control {
+    background-color: #2a2a2a !important;
+  }
+  
+  .q-field__native, 
+  .q-field__label {
+    color: #e0e0e0 !important;
+  }
+  
+  &.q-field--focused {
+    .q-field__control {
+      box-shadow: 0 0 0 2px rgba(66, 165, 245, 0.4);
+    }
+  }
+}
+
+.audio-player {
+  background-color: #2a2a2a;
+  border-radius: 8px;
+  padding: 8px;
+  
+  audio {
+    filter: invert(0.8);
+  }
+}
+
+:deep(.q-fab) {
+  .q-fab__icon-holder {
+    transition: all 0.3s ease;
+  }
+  
+  &:hover {
+    .q-fab__icon-holder {
+      transform: scale(1.05);
+    }
+  }
+}
+
 </style>

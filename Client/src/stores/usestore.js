@@ -67,8 +67,15 @@ export const useStore = defineStore('NoteStore', () => {
       return false;
     }
   }
-  
-  async function uploadFile(file, type = 'image') {
+
+
+  async function uploadImage(imageBlob) {
+    const formData = new FormData();
+    formData.append('image', imageBlob, `note-image-${Date.now()}.jpg`);
+    
+    // Add a specific path parameter to tell the server where to save the image
+    formData.append('uploadPath', '/public/images');
+    
     try {
       const formData = new FormData();
       formData.append('file', file, `note-${type}-${Date.now()}.${file.name.split('.').pop()}`);
@@ -85,13 +92,7 @@ export const useStore = defineStore('NoteStore', () => {
       return null;
     }
   }
-  
-  return {
-    notes,
-    fetchNotes,
-    addNote,
-    updateNote,
-    deleteNote,
-    uploadFile
-  };
+
+
+  return { notes, fetchNotes, addNote, updateNote, deleteNote, uploadImage };
 });

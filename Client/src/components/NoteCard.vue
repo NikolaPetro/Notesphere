@@ -69,6 +69,9 @@ const props = defineProps({
   transition: all 0.3s ease;
   border-radius: 8px;
   margin-bottom: 12px;
+  width: auto;
+  height: auto;
+  min-width: 200px;
 }
 
 .note-card:hover {

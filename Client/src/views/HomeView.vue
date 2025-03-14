@@ -70,14 +70,14 @@ import NoteModal from '../components/NoteModal.vue';
 const store = useStore();
 const searchTerm = ref('');
 const selectedNote = ref(null);
-const viewType = ref('grid'); // Default view type
+const viewType = ref('grid');
 const creatingNote = ref(false);
 
 const setDefaultViewType = () => {
-  if (window.innerWidth <= 768) { // Adjust the width as needed for mobile
-    viewType.value = 'list'; // Set to list view on mobile
+  if (window.innerWidth <= 768) { 
+    viewType.value = 'list'; 
   } else {
-    viewType.value = 'grid'; // Set to grid view on larger screens
+    viewType.value = 'grid';
   }
 };
 
@@ -105,11 +105,10 @@ const createNote = async (type) => {
 
 onMounted(() => {
   store.fetchNotes();
-  setDefaultViewType(); // Set the default view type on mount
-  window.addEventListener('resize', setDefaultViewType); // Update on resize
+  setDefaultViewType();
+  window.addEventListener('resize', setDefaultViewType); 
 });
 
-// Clean up the event listener when the component is unmounted
 onBeforeUnmount(() => {
   window.removeEventListener('resize', setDefaultViewType);
 });
@@ -176,9 +175,7 @@ onBeforeUnmount(() => {
   }
 }
 
-// Add dark mode CSS variables for your primary color
-// Replace with your app's primary color
 :root {
-  --q-primary: 66, 165, 245; // This is a blue color, adjust as needed
+  --q-primary: 66, 165, 245;
 }
 </style>

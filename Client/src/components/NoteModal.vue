@@ -135,14 +135,12 @@ watch(() => props.note, (newNote) => {
   Object.assign(editedNote, newNote)
 })
 
-// Request notification permission on component mount
 onMounted(() => {
   if (Notification.permission !== 'granted') {
     Notification.requestPermission();
   }
 })
 
-// Function to show notification
 const showNotification = (message) => {
   if (Notification.permission === 'granted') {
     new Notification(message);
@@ -152,10 +150,10 @@ const showNotification = (message) => {
 const closeModal = () => {
   if (isNoteEmpty(editedNote)) {
     emit('delete', editedNote.id)
-    showNotification('Note deleted successfully!') // Notification on delete
+    showNotification('Note deleted successfully!') 
   } else {
     emit('update', editedNote)
-    showNotification('Note saved successfully!') // Notification on save
+    showNotification('Note saved successfully!') 
   }
   emit('close')
 }
@@ -173,10 +171,10 @@ const isNoteEmpty = (note) => {
 const saveNote = async () => {
   if (editedNote.id) {
     await store.updateNote(editedNote.id, editedNote)
-    showNotification('Note updated successfully!') // Notification on update
+    showNotification('Note updated successfully!')  
   } else {
     await store.addNote(editedNote)
-    showNotification('Note added successfully!') // Notification on add
+    showNotification('Note added successfully!') 
   }
   showModal.value = false
 }
@@ -201,7 +199,7 @@ const handleFileUpload = async (event) => {
       }
     }
     reader.readAsDataURL(file)
-    showNotification('File uploaded successfully!') // Notification on file upload
+    showNotification('File uploaded successfully!') 
   }
 }
 
